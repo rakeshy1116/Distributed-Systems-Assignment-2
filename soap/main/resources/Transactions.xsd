@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="ecommerce/soap/Transactions"
+	xmlns:tns="ecommerce/soap/Transactions"
+	elementFormDefault="qualified">
+
+	<xsd:element name="TransactionRequest">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="buyerName" type="xsd:string" />
+				<xsd:element name="cardNumber" type="xsd:string" />
+				<xsd:element name="expiryDate" type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="TransactionStatus">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="isSuccess" type="xsd:boolean" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>
