@@ -1,0 +1,44 @@
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:sch="ecommerce/soap/Transactions" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.javatechie.com/spring/soap/api/loanEligibility" targetNamespace="http://www.javatechie.com/spring/soap/api/loanEligibility">
+<wsdl:types>
+<xsd:schema xmlns:tns="ecommerce/soap/Transactions" xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="ecommerce/soap/Transactions">
+<xsd:element name="TransactionRequest">
+<xsd:complexType>
+<xsd:sequence>
+<xsd:element name="buyerName" type="xsd:string"/>
+<xsd:element name="cardNumber" type="xsd:string"/>
+<xsd:element name="expiryDate" type="xsd:string"/>
+</xsd:sequence>
+</xsd:complexType>
+</xsd:element>
+<xsd:element name="TransactionStatus">
+<xsd:complexType>
+<xsd:sequence>
+<xsd:element name="isSuccess" type="xsd:boolean"/>
+</xsd:sequence>
+</xsd:complexType>
+</xsd:element>
+</xsd:schema>
+</wsdl:types>
+<wsdl:message name="TransactionRequest">
+<wsdl:part element="sch:TransactionRequest" name="TransactionRequest"> </wsdl:part>
+</wsdl:message>
+<wsdl:portType name="TransactionIndicatior">
+<wsdl:operation name="Transaction">
+<wsdl:input message="tns:TransactionRequest" name="TransactionRequest"> </wsdl:input>
+</wsdl:operation>
+</wsdl:portType>
+<wsdl:binding name="TransactionIndicatiorSoap11" type="tns:TransactionIndicatior">
+<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+<wsdl:operation name="Transaction">
+<soap:operation soapAction=""/>
+<wsdl:input name="TransactionRequest">
+<soap:body use="literal"/>
+</wsdl:input>
+</wsdl:operation>
+</wsdl:binding>
+<wsdl:service name="TransactionIndicatiorService">
+<wsdl:port binding="tns:TransactionIndicatiorSoap11" name="TransactionIndicatiorSoap11">
+<soap:address location="http://localhost:8089/ws"/>
+</wsdl:port>
+</wsdl:service>
+</wsdl:definitions>
