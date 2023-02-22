@@ -76,8 +76,10 @@ Refer perfomance-report.pdf file
 
 2. Run the seller server and buyer server using following commands:
 
-``` java -cp ecommerce.jar ecommerce.SellerServer ```
-``` java -cp ecommerce.jar ecommerce.BuyerServer ```
+``` java -cp rpc.jar ecommerce.GrpcSeller ```
+``` java -cp rpc.jar ecommerce.GrpcBuyer ```
+``` java -jar rest.jar ecommerce.EcommerceApplication ```
+``` java -jar soap-transactions.jar com.javatechie.spring.soap.api.SpringBootSopaWsApplication ```
 
 3. Similarly for clients
 
