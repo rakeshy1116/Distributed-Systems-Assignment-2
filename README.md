@@ -2,6 +2,7 @@
 
 <h3>Team Members:</h3>
 1. Rakesh Chowdary Yarlagadda
+ 
 2. Gautam Gottipatti
 
 <h3>System design:</h3>
@@ -77,11 +78,23 @@ Refer perfomance-report.pdf file
 2. Run the seller server and buyer server using following commands:
 
 ``` java -cp rpc.jar ecommerce.GrpcSeller ```
+
+
 ``` java -cp rpc.jar ecommerce.GrpcBuyer ```
+
+
 ``` java -jar rest.jar ecommerce.EcommerceApplication ```
+
+
 ``` java -jar soap-transactions.jar com.javatechie.spring.soap.api.SpringBootSopaWsApplication ```
+
+
 
 3. Similarly for clients
 
 ``` java -cp rpc.jar ecommerce.RestBuyerClient buyer.txt http://34.173.218.61: 8080 $i ```
+
+
 ``` java -cp rpc.jar ecommerce.RestSellerClient seller1.txt http://35.225.95.26: 8080 $i ```
+
+
