@@ -1,4 +1,4 @@
-<h2> Distributed Systems Assignment-1 </h2>
+<h2> Distributed Systems Assignment - 2 </h2>
 
 <h3>Team Members:</h3>
 1. Rakesh Chowdary Yarlagadda
@@ -15,7 +15,7 @@ Our system has 6 components:
 5. Product and 
 6. Customer Databases 
 
-We have used dynamodb for storing item, buyer, seller and shopping cart data. We have implemented the tcp communication using socket programming in java. for performance measures we have deployed our front end and backend of seller and buyer servers in 4 different virtual machines in google cloud with 4 different ip addresses and port numbers.
+We have used dynamodb for storing item, buyer, seller, shopping cart and transactions data. Communication between client and server front end is done using REST APIs and is implement using spring framework in Java. and Communication between server front and backend is done using GRPC. and for make Purchase function, we have soap protocol to check the transaction status. for performance measures we have deployed our front end and backend of seller and buyer servers in 4 different virtual machines in google cloud with 4 different ip addresses and port numbers.
 
 <h3>Assumptions:</h3>
 
@@ -28,6 +28,8 @@ We have used dynamodb for storing item, buyer, seller and shopping cart data. We
 8. Created a table for shopping cart, where buyer id is the primary key for this table and it has list of items.
 9. For remove and clear shopping cart, the items list will be updated and removed to reflect the changes for the given buyer id.
 10. When a buyer provides feedback, corresponding seller record will be updated.
+11. For Make Purchase, all items in current shoping cart will be considered, if the soap provides response as true, a new transaction will be created with these items and their corresponding quantities will be reduced(updated) in the inventory.
+12. for purchase history,
 
 <h4>Semantics for search function:</h4>
 
@@ -59,10 +61,8 @@ User will provide item category and five search keywords. then, All the items fr
 8. Display shopping cart
 9. Provide feedback
 10. Get seller rating
-
-<h3> What doesn't works: </h3>
-
-1. Get buyer purchase history (since make purchase is not implemented it returns empty output).
+11. Make purchase
+12. Get buyer purchase history
 
 
 <h4> Performances </h4>
@@ -81,5 +81,5 @@ Refer perfomance-report.pdf file
 
 3. Similarly for clients
 
-``` java -cp ecommerce.jar ecommerce.SellerClient ipaddress_of_sellerServer seller1.txt ```
-
+``` java -cp rpc.jar ecommerce.RestBuyerClient buyer.txt http://34.173.218.61: 8080 $i ```
+``` java -cp rpc.jar ecommerce.RestSellerClient seller1.txt http://35.225.95.26: 8080 $i ```
