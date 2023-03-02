@@ -526,7 +526,7 @@ public class GrpcBuyerServer extends ecommerce.BuyerGrpc.BuyerImplBase{
             }
         }
 
-        if(!loginFlag) {
+        if(loginFlag) {
             DynamoDBQueryExpression<Buyer> query1 = new DynamoDBQueryExpression<>();
             query1.setHashKeyValues(new Buyer(request.getBuyerId()));
             PaginatedQueryList<Buyer> list1 = db.query(Buyer.class, query1);
