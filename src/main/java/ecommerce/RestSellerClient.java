@@ -1,18 +1,18 @@
 package ecommerce;
 
 
-        import org.json.simple.JSONArray;
-        import org.json.simple.JSONObject;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
-        import java.io.*;
-        import java.net.HttpURLConnection;
-        import java.net.Socket;
-        import java.net.URI;
-        import java.net.URL;
-        import java.net.http.HttpClient;
-        import java.net.http.HttpRequest;
-        import java.net.http.HttpResponse;
-        import java.util.Arrays;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.Socket;
+import java.net.URI;
+import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.Arrays;
 
 public class RestSellerClient {
     private PrintWriter out;
@@ -37,8 +37,9 @@ public class RestSellerClient {
         HttpURLConnection con = establishConnection(url,"/removeItem","DELETE");
         String[] components = payload.split(" ");
         JSONObject obj = new JSONObject();
-        obj.put("itemId", components[1]);
-        obj.put("quantity", components[2]);
+        obj.put("sellerId", components[1]);
+        obj.put("itemId", components[2]);
+        obj.put("quantity", components[3]);
         String jsonInputString = obj
                 .toString();
         try(OutputStream os = con.getOutputStream()) {
@@ -57,7 +58,7 @@ public class RestSellerClient {
 
 
     static public HttpURLConnection establishConnection(String url,String endpoint,String RequestMethod) throws IOException {
-        URL lol = new URL (url+endpoint);
+        URL lol = new URL(url+endpoint);
         HttpURLConnection con = (HttpURLConnection)lol.openConnection();
         con.setRequestMethod(RequestMethod);
         con.setRequestProperty("Content-Type", "application/json");
@@ -143,8 +144,9 @@ public class RestSellerClient {
         HttpURLConnection con = establishConnection(url,"/updateItemPrice","PUT");
         String[] components = payload.split(" ");
         JSONObject obj = new JSONObject();
-        obj.put("itemId", components[1]);
-        obj.put("salePrice", components[2]);
+        obj.put("sellerId", components[1]);
+        obj.put("itemId", components[2]);
+        obj.put("salePrice", components[3]);
         String jsonInputString = obj
                 .toString();
         try(OutputStream os = con.getOutputStream()) {
@@ -157,16 +159,90 @@ public class RestSellerClient {
 
 
 
+//        public static void main(String[] args) throws IOException, InterruptedException{
+//            HttpClient client = HttpClient.newHttpClient();
+//            String ip_address = args[1];
+//            String portNum = args[2];
+//            final long startTime = System.currentTimeMillis();
+//            File file = new File(args[0]);
+//            BufferedReader br = new BufferedReader(new FileReader(file));
+//            String st;
+//            while ((st = br.readLine()) != null) {
+//                // System.out.println(st+);
+//                String[] parts = st.split(" ");
+//                String part1 = parts[0];
+//
+//                if(part1.equals("1")){
+//                    createAccount(ip_address+portNum, st);
+//                }
+//                else if(part1.equals("2")){
+//                    login(ip_address+portNum, st);
+//                }
+//                else if(part1.equals("3")){
+//                    logout(ip_address+portNum, st);
+//                }
+//                else if(part1.equals("4")){
+//                    rating(ip_address+portNum, st);
+//                }
+//                else if(part1.equals("5")){
+//                    putItem(ip_address+portNum, st);
+//                }
+//
+//                else if(part1.equals("6")){
+//                    updateItem(ip_address+portNum, st);
+//                }
+//                else if(part1.equals("7")) {
+//                    removeItem(ip_address+portNum, st);
+//                }
+//                else if(part1.equals("8")) {
+//                    displayItemsOnSale(ip_address+portNum, st);
+//                }
+//
+//                // System.out.println(st + st.charAt(0));
+//            }
+//
+//            final long endTime = System.currentTimeMillis();
+//            System.out.println("Seller client execution time: " + (endTime - startTime));
+//             String finalMessage = "Seller Server start time: " + startTime + " end time: " + endTime;
+//            System.out.println(finalMessage);
+//            String filename = String.valueOf(startTime)+"_seller"+"_"+String.valueOf(args[3]);
+//            try {
+//                FileWriter myWriter = new FileWriter(filename);
+//                myWriter.write(finalMessage + "\n" + "Seller client execution time: " + (endTime - startTime));
+//                myWriter.close();
+//            } catch (IOException e) {
+//                System.out.println("An error occurred.");
+//                e.printStackTrace();
+//            }
+//    }
+
+    //local implementation
     public static void main(String[] args) throws IOException, InterruptedException{
         HttpClient client = HttpClient.newHttpClient();
-        String ip_address = args[1];
-        String portNum = args[2];
+//        String ip_address = args[1];
+        String ip_address = "http://localhost";
+//        String portNum = args[2];
+        String portNum = ":8080";
         final long startTime = System.currentTimeMillis();
-        File file = new File(args[0]);
-        BufferedReader br = new BufferedReader(new FileReader(file));
+//        File file = new File(args[0]);
+//        BufferedReader br = new BufferedReader(new FileReader(file));
         String st;
-        while ((st = br.readLine()) != null) {
+        while (true) {
+            System.out.println();
+            System.out.println("1 createSellerAccount: Enter sellerName <space> sellerId");
+            System.out.println("2 loginSeller: Enter sellerId <space> password");
+            System.out.println("3 logoutSeller: Enter sellerId");
+            System.out.println("4 sellerRating: Enter sellerId");
+            System.out.println("5 putItem: Enter itemName, itemCategory, itemId, keywords, condition, salePrice, sellerId, itemQuantity");
+            System.out.println("6 updateItemSalePrice: Enter sellerId <space> itemId <space> newPrice");
+            System.out.println("7 removeItem: Enter sellerId <space> itemId <space> quantity");
+            System.out.println("8 displayItemsOnSale: Enter sellerId");
             // System.out.println(st+);
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            st = br.readLine();
+            if(st.equals("exit"))
+                break;
+            System.out.println();
             String[] parts = st.split(" ");
             String part1 = parts[0];
 

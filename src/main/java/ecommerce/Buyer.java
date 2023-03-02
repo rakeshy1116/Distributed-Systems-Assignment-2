@@ -15,22 +15,22 @@ public class Buyer {
 
     private String password;
 
-    private boolean isLoggedin;
+    private boolean loggedin;
 
     public Buyer(String buyerName, Long buyerId, List<Long> itemsPurchase, String password, Boolean isLoggedin) {
         this.buyerName = buyerName;
         this.buyerId = buyerId;
         this.itemsPurchase = new ArrayList<>();
         this.password = password;
-        this.isLoggedin = false;
+        this.loggedin = false;
     }
 
     public boolean isLoggedin() {
-        return isLoggedin;
+        return this.loggedin;
     }
 
     public void setLoggedin(boolean loggedin) {
-        isLoggedin = loggedin;
+        this.loggedin = loggedin;
     }
 
     public String getBuyerName() {

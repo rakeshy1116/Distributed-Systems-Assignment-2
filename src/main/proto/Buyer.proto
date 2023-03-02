@@ -88,6 +88,7 @@ message displayShoppingCartResponse {
 }
 
 message feedBackSellerRequest {
+  uint64 buyerId = 36;
   uint64 itemId = 21;
   int32 rating = 22;
 }

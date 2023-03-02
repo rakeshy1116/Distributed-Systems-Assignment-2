@@ -20,7 +20,7 @@ public class Seller {
     private List<Integer> feedback; //first int will be thumbs up, second will be thumbs down
     private int itemsSold;
     private String password;
-    private boolean isLoggedin;
+    private boolean loggedin;
 
     public Seller(String sellerName, Long sellerId, List<Integer> feedback, int itemsSold, String password) {
         this.sellerName = sellerName;
@@ -28,15 +28,15 @@ public class Seller {
         this.feedback = feedback;
         this.itemsSold = itemsSold;
         this.password = password;
-        this.isLoggedin = false;
+        this.loggedin = false;
     }
 
     public boolean isLoggedin() {
-        return isLoggedin;
+        return this.loggedin;
     }
 
     public void setLoggedin(boolean loggedin) {
-        isLoggedin = loggedin;
+       this.loggedin = loggedin;
     }
 
 

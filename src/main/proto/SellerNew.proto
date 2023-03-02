@@ -54,6 +54,7 @@ message putItemResponse {
 
 
 message updateItemSalePriceRequest {
+      uint64 sellerId = 27;
       uint64 itemId = 19;
       double newSalePrice = 20;
 }
@@ -63,6 +64,7 @@ message updateItemSalePriceResponse {
 }
 
 message removeItemRequest {
+      uint64 sellerId = 28;
       uint64 itemId = 22;
       int32 quantity = 23;
 }
