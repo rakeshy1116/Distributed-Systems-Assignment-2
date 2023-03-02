@@ -103,7 +103,7 @@ public class RestBuyerClient {
     }
 
     static public void removeFromShoppingCart(String url, String payload) throws IOException, InterruptedException{
-        HttpURLConnection con = establishConnection(url,"/removeItemFromShoppingCart","POST");
+        HttpURLConnection con = establishConnection(url,"/removeItemFromShoppingCart","PUT");
         String[] components = payload.split(" ");
         JSONObject obj = new JSONObject();
         obj.put("buyerId", components[1]);
@@ -119,7 +119,7 @@ public class RestBuyerClient {
     }
 
     static public void clearShoppingCart(String url, String payload) throws IOException, InterruptedException{
-        HttpURLConnection con = establishConnection(url,"/clearShoppingCart","POST");
+        HttpURLConnection con = establishConnection(url,"/clearShoppingCart","DELETE");
         String[] components = payload.split(" ");
         JSONObject obj = new JSONObject();
         obj.put("buyerId", components[1]);

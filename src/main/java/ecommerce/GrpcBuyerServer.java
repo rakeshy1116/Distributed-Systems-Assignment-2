@@ -266,10 +266,10 @@ public class GrpcBuyerServer extends ecommerce.BuyerGrpc.BuyerImplBase{
 //                   .setBuyerId(request.getBuyerId())
 //                   .build());
             }
-        }
-        if(response=="")
-            response = new StringBuilder().append("Removed " + request.getQuantity() + " quantities of item with item id " + request.getItemId() + " from shopping cart").toString();
 
+            if (response == "")
+                response = new StringBuilder().append("Removed " + request.getQuantity() + " quantities of item with item id " + request.getItemId() + " from shopping cart").toString();
+        }
         removeFromShoppingCartResponse ans = removeFromShoppingCartResponse.newBuilder()
                 .setRemoveFromShoppingCartStatus(response)
                 .build();
@@ -600,7 +600,7 @@ public class GrpcBuyerServer extends ecommerce.BuyerGrpc.BuyerImplBase{
             }
         }
 
-        if(!loginFlag) {
+        if(loginFlag) {
 
             DynamoDBQueryExpression<ShoppingCart> query = new DynamoDBQueryExpression<>();
             query.setHashKeyValues(new ShoppingCart(buyerId));
