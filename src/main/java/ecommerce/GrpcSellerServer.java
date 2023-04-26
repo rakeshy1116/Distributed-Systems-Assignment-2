@@ -39,13 +39,16 @@ public class GrpcSellerServer extends ecommerce.SellerGrpc.SellerImplBase{
         }
         else {
             Seller currentUser = iter.next();
-            if(currentUser.getPassword().equals(request.getPassword())){
-                currentUser.setLoggedin(true);
-                db.save(currentUser);
-                response = new StringBuilder().append("Correct Password.. Logged in").toString();
-            }
+            if(currentUser.isLoggedin())
+                response = new StringBuilder().append("Already Logged in.").toString();
             else {
-                response = new StringBuilder().append("Wrong Password").toString();
+                if (currentUser.getPassword().equals(request.getPassword())) {
+                    currentUser.setLoggedin(true);
+                    db.save(currentUser);
+                    response = new StringBuilder().append("Correct Password.. Logged in").toString();
+                } else {
+                    response = new StringBuilder().append("Wrong Password").toString();
+                }
             }
         }
         sellerLoginResponse ans = sellerLoginResponse.newBuilder()
@@ -101,10 +104,14 @@ public class GrpcSellerServer extends ecommerce.SellerGrpc.SellerImplBase{
         Iterator<Seller> iter = list.iterator();
         while(iter.hasNext()) {
             Seller currentUser = iter.next();
-            currentUser.setLoggedin(false);
-            db.save(currentUser);
-            response = new StringBuilder().append( "Logged out.. Log in back").toString();
-            flag = true;
+            if(!currentUser.isLoggedin())
+                response = new StringBuilder().append("Not logged in.. to logout").toString();
+            else {
+                currentUser.setLoggedin(false);
+                db.save(currentUser);
+                response = new StringBuilder().append("Logged out.. Log in back").toString();
+                flag = true;
+            }
         }
         if(!flag)
             response = new StringBuilder().append( "No user").toString();
@@ -153,22 +160,46 @@ public class GrpcSellerServer extends ecommerce.SellerGrpc.SellerImplBase{
     public void putItem(putItemRequest request,
                    io.grpc.stub.StreamObserver<putItemResponse> responseObserver) { //specify name in the query as well
         DynamoDBMapper db = DynamoDBSample.getInstance().getMapper();
-        Long sellerId = request.getSellerId();
-        Long itemId = createItemID();
-        String itemName = request.getItemName();
-        int itemCategory = request.getItemCategory();
-        List<String> keywords = new ArrayList<>();
-        for (int i = 3; i <= 7; i++) {
-            keywords.add(request.getKeywords(i-3));
+        DynamoDBQueryExpression<Seller> queryUser = new DynamoDBQueryExpression<>();
+        queryUser.setHashKeyValues(new Seller(request.getSellerId()));
+        PaginatedQueryList<Seller> listUser = db.query(Seller.class, queryUser);
+        String response ="";
+        Iterator<Seller> iterUser = listUser.iterator();
+        boolean loginFlag = true;
+        if(!iterUser.hasNext())
+        {
+            response = new StringBuilder().append("No user with given sellerId.").toString();
+            loginFlag = false;
         }
-        boolean condition = request.getCondition();
-        double salePrice = request.getSalePrice();
-        int itemQuantity = request.getQuantity();
-        Item currentItem = new Item(itemName, itemCategory, itemId, keywords, condition, salePrice, sellerId,itemQuantity);
-        db.save(currentItem);
 
+        while (iterUser.hasNext()) {
+            Seller currentUser = iterUser.next();
+            if(!currentUser.isLoggedin())
+            {
+                response = new StringBuilder().append("Not logged in to perform the action").toString();
+                loginFlag = false;
+                break;
+            }
+        }
+
+        if(loginFlag) {
+            Long sellerId = request.getSellerId();
+            Long itemId = createItemID();
+            String itemName = request.getItemName();
+            int itemCategory = request.getItemCategory();
+            List<String> keywords = new ArrayList<>();
+            for (int i = 3; i <= 7; i++) {
+                keywords.add(request.getKeywords(i - 3));
+            }
+            boolean condition = request.getCondition();
+            double salePrice = request.getSalePrice();
+            int itemQuantity = request.getQuantity();
+            Item currentItem = new Item(itemName, itemCategory, itemId, keywords, condition, salePrice, sellerId, itemQuantity);
+            db.save(currentItem);
+            response = new StringBuilder().append("placed Item for sale with ItemId: " + String.valueOf(itemId)).toString();
+        }
         putItemResponse ans = putItemResponse.newBuilder()
-                .setPutItemStatus("placed Item for sale with ItemId: " + String.valueOf(itemId))
+                .setPutItemStatus(response)
                 .build();
 
         responseObserver.onNext(ans);
@@ -178,17 +209,41 @@ public class GrpcSellerServer extends ecommerce.SellerGrpc.SellerImplBase{
     public void updateItemSalePrice(updateItemSalePriceRequest request,
                                     io.grpc.stub.StreamObserver<updateItemSalePriceResponse> responseObserver) { //assuming same seller is doing the update
         DynamoDBMapper db = DynamoDBSample.getInstance().getMapper();
-        DynamoDBQueryExpression<Item> query = new DynamoDBQueryExpression<>();
-        query.setHashKeyValues(new Item(request.getItemId()));
-        PaginatedQueryList<Item> list = db.query(Item.class, query);
-        Iterator<Item> iter = list.iterator();
-        String response = "";
-        if(!iter.hasNext()) response = "No item found with given ItemId";
-        else {
-            Item currentItem = iter.next();
-            currentItem.setSalePrice(request.getNewSalePrice());
-            db.save(currentItem);
-            response = "Item price updated to: " + request.getNewSalePrice();
+        DynamoDBQueryExpression<Seller> queryUser = new DynamoDBQueryExpression<>();
+        queryUser.setHashKeyValues(new Seller(request.getSellerId()));
+        PaginatedQueryList<Seller> listUser = db.query(Seller.class, queryUser);
+        String response ="";
+        Iterator<Seller> iterUser = listUser.iterator();
+        boolean loginFlag = true;
+        if(!iterUser.hasNext())
+        {
+            response = new StringBuilder().append("No user with given sellerId.").toString();
+            loginFlag = false;
+        }
+
+        while (iterUser.hasNext()) {
+            Seller currentUser = iterUser.next();
+            if(!currentUser.isLoggedin())
+            {
+                response = new StringBuilder().append("Not logged in to perform the action").toString();
+                loginFlag = false;
+                break;
+            }
+        }
+
+        if(loginFlag) {
+            DynamoDBQueryExpression<Item> query = new DynamoDBQueryExpression<>();
+            query.setHashKeyValues(new Item(request.getItemId()));
+            PaginatedQueryList<Item> list = db.query(Item.class, query);
+            Iterator<Item> iter = list.iterator();
+
+            if (!iter.hasNext()) response = "No item found with given ItemId";
+            else {
+                Item currentItem = iter.next();
+                currentItem.setSalePrice(request.getNewSalePrice());
+                db.save(currentItem);
+                response = "Item price updated to: " + request.getNewSalePrice();
+            }
         }
         updateItemSalePriceResponse ans = updateItemSalePriceResponse.newBuilder()
                 .setUpdateItemSalePriceStatus(response)
@@ -201,21 +256,44 @@ public class GrpcSellerServer extends ecommerce.SellerGrpc.SellerImplBase{
     public void removeItem(removeItemRequest request,
                            io.grpc.stub.StreamObserver<removeItemResponse> responseObserver) { //assuming same seller is doing the update
         DynamoDBMapper db = DynamoDBSample.getInstance().getMapper();
-        DynamoDBQueryExpression<Item> query = new DynamoDBQueryExpression<>();
-        query.setHashKeyValues(new Item(request.getItemId()));
-        PaginatedQueryList<Item> list = db.query(Item.class, query);
-        Iterator<Item> iter = list.iterator();
-        String response = "";
-        if(!iter.hasNext()) response = "No item found with given ItemId";
-        else {
-            Item currentItem = iter.next();
-            if(currentItem.getItemQuantity()<=request.getQuantity())
-                db.delete(currentItem);
-            else
+        DynamoDBQueryExpression<Seller> queryUser = new DynamoDBQueryExpression<>();
+        queryUser.setHashKeyValues(new Seller(request.getSellerId()));
+        PaginatedQueryList<Seller> listUser = db.query(Seller.class, queryUser);
+        String response ="";
+        Iterator<Seller> iterUser = listUser.iterator();
+        boolean loginFlag = true;
+        if(!iterUser.hasNext())
+        {
+            response = new StringBuilder().append("No user with given sellerId.").toString();
+            loginFlag = false;
+        }
+
+        while (iterUser.hasNext()) {
+            Seller currentUser = iterUser.next();
+            if(!currentUser.isLoggedin())
             {
-                currentItem.setItemQuantity(currentItem.getItemQuantity()-request.getQuantity());
-                db.save(currentItem);
-                response = request.getQuantity() + " quantities of Item with following ItemID: " + request.getItemId() + " are removed.";
+                response = new StringBuilder().append("Not logged in to perform the action").toString();
+                loginFlag = false;
+                break;
+            }
+        }
+
+        if(loginFlag) {
+            DynamoDBQueryExpression<Item> query = new DynamoDBQueryExpression<>();
+            query.setHashKeyValues(new Item(request.getItemId()));
+            PaginatedQueryList<Item> list = db.query(Item.class, query);
+            Iterator<Item> iter = list.iterator();
+
+            if (!iter.hasNext()) response = "No item found with given ItemId";
+            else {
+                Item currentItem = iter.next();
+                if (currentItem.getItemQuantity() <= request.getQuantity())
+                    db.delete(currentItem);
+                else {
+                    currentItem.setItemQuantity(currentItem.getItemQuantity() - request.getQuantity());
+                    db.save(currentItem);
+                    response = request.getQuantity() + " quantities of Item with following ItemID: " + request.getItemId() + " are removed.";
+                }
             }
         }
         removeItemResponse ans = removeItemResponse.newBuilder()
@@ -230,22 +308,44 @@ public class GrpcSellerServer extends ecommerce.SellerGrpc.SellerImplBase{
     public void displayItemsOnSale(displayItemsOnSaleRequest request,
                                    io.grpc.stub.StreamObserver<displayItemsOnSaleResponse> responseObserver) { //assuming same seller is doing the update
         DynamoDBMapper db = DynamoDBSample.getInstance().getMapper();
-        DynamoDBQueryExpression<Item> query = new DynamoDBQueryExpression<>();
-        DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
-
-        PaginatedScanList<Item> list = db.scan(Item.class, scanExpression);
-
-        Iterator<Item> iter = list.iterator();
-
-        Long sellerId = request.getSellerId();
-        StringBuilder response = new StringBuilder();
-        while(iter.hasNext())
+        DynamoDBQueryExpression<Seller> queryUser = new DynamoDBQueryExpression<>();
+        queryUser.setHashKeyValues(new Seller(request.getSellerId()));
+        PaginatedQueryList<Seller> listUser = db.query(Seller.class, queryUser);
+        StringBuilder response =new StringBuilder();
+        Iterator<Seller> iterUser = listUser.iterator();
+        boolean loginFlag = true;
+        if(!iterUser.hasNext())
         {
-            Item currentItem = iter.next();
-            if(currentItem.getSellerId()==sellerId)
+            response = new StringBuilder(new StringBuilder().append("No user with given sellerId.").toString());
+            loginFlag = false;
+        }
+
+        while (iterUser.hasNext()) {
+            Seller currentUser = iterUser.next();
+            if(!currentUser.isLoggedin())
             {
-                response.append(currentItem.getItemName());
-                response.append(", ");
+                response = new StringBuilder(new StringBuilder().append("Not logged in to perform the action").toString());
+                loginFlag = false;
+                break;
+            }
+        }
+
+        if(loginFlag) {
+            DynamoDBQueryExpression<Item> query = new DynamoDBQueryExpression<>();
+            DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
+
+            PaginatedScanList<Item> list = db.scan(Item.class, scanExpression);
+
+            Iterator<Item> iter = list.iterator();
+
+            Long sellerId = request.getSellerId();
+//        StringBuilder response = new StringBuilder();
+            while (iter.hasNext()) {
+                Item currentItem = iter.next();
+                if (currentItem.getSellerId() == sellerId) {
+                    response.append(currentItem.getItemName());
+                    response.append(", ");
+                }
             }
         }
         displayItemsOnSaleResponse ans = displayItemsOnSaleResponse.newBuilder()

@@ -27,7 +27,7 @@ public class SoapTransaction {
 //            Properties prop = new Properties();
 //            prop.load(propsInput);
             // Set the endpoint URL and the SOAP XML request
-            String endpoint = "http://34.27.22.76:8089/ws";
+            String endpoint = "http://104.198.137.72:8089/ws";
 //            String buyerName = "rakesh";
 //            String cardNumber = "112";
 //            String expiryDate = "12/22";
